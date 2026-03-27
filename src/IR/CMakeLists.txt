@@ -14,3 +14,9 @@ add_library(
     QueryGraph2SQL.cpp
     Tuple.cpp
 )
+
+add_library(
+    TwoPhaseOptimizer
+    OBJECT
+    TwoPhaseOptimizer.cpp
+)

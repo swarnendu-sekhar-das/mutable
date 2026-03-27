@@ -19,6 +19,7 @@ set(
     version.cpp
     $<TARGET_OBJECTS:backend>
     $<TARGET_OBJECTS:IR>
+    $<TARGET_OBJECTS:TwoPhaseOptimizer>
     $<TARGET_OBJECTS:io>
     $<TARGET_OBJECTS:storage>
     $<TARGET_OBJECTS:parse>
@@ -80,8 +81,12 @@ else()
     message(STATUS "Bundling libraries ${static_libs}")
 
     # Detect the toolchain to use for bundling.
-    if (CMAKE_CXX_COMPILER_ID MATCHES "^(Clang)$")
-        set(ar_tool ${CMAKE_CXX_COMPILER_AR})
+    if (CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|AppleClang)$")
+        if(CMAKE_CXX_COMPILER_AR)
+            set(ar_tool ${CMAKE_CXX_COMPILER_AR})
+        else()
+            set(ar_tool "ar")
+        endif()
         file(
             WRITE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_bundled.ar.in
             "CREATE \"${BUNDLED_FULL_NAME}\"\n"
@@ -97,13 +102,25 @@ else()
         )
 
         # Invoke the archiver tool to bundle the static libraries.
-        add_custom_command(
-            OUTPUT "${BUNDLED_FULL_NAME}"
-            COMMAND ${ar_tool} -M < "${CMAKE_BINARY_DIR}/${PROJECT_NAME}_bundled.ar"
-            DEPENDS ${static_libs}
-            COMMENT "Bundling ${PROJECT_NAME}"
-            VERBATIM
-        )
+        if(APPLE)
+            # On macOS, use libtool to combine static libraries
+            add_custom_command(
+                OUTPUT "${BUNDLED_FULL_NAME}"
+                COMMAND libtool -static -o "${BUNDLED_FULL_NAME}" ${static_libs}
+                DEPENDS ${static_libs}
+                COMMENT "Bundling ${PROJECT_NAME}"
+                VERBATIM
+            )
+        else()
+            # On other platforms, use ar with script
+            add_custom_command(
+                OUTPUT "${BUNDLED_FULL_NAME}"
+                COMMAND ${ar_tool} -M < "${CMAKE_BINARY_DIR}/${PROJECT_NAME}_bundled.ar"
+                DEPENDS ${static_libs}
+                COMMENT "Bundling ${PROJECT_NAME}"
+                VERBATIM
+            )
+        endif()
     else()
         message(FATAL_ERROR "Unknown bundle scenario!")
     endif()

@@ -1,4 +1,5 @@
 #include <mutable/IR/PlanEnumerator.hpp>
+#include <mutable/IR/TwoPhaseOptimizer.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -740,8 +741,23 @@ void TDGOO::operator()(enumerate_tag, PlanTable &PT, const QueryGraph &G, const 
 #define INSTANTIATE(NAME, _) \
     template void NAME::operator()(enumerate_tag, PlanTableSmallOrDense &PT, const QueryGraph &G, const CostFunction &CF) const; \
     template void NAME::operator()(enumerate_tag, PlanTableLargeAndSparse &PT, const QueryGraph &G, const CostFunction &CF) const;
-LIST_PE(INSTANTIATE)
+#define LIST_PE_INSTANTIATE(X) \
+    X(DPccp,        "enumerates connected subgraph complement pairs") \
+    X(DPsize,       "size-based subproblem enumeration") \
+    X(DPsizeOpt,    "optimized DPsize: does not enumerate symmetric subproblems") \
+    X(DPsizeSub,    "DPsize with enumeration of subset complement pairs") \
+    X(DPsub,        "subset-based subproblem enumeration") \
+    X(DPsubOpt,     "optimized DPsub: does not enumerate symmetric subproblems") \
+    X(GOO,          "Greedy Operator Ordering") \
+    X(TDGOO,        "Top-down variant of Greedy Operator Ordering") \
+    X(IKKBZ,        "greedy algorithm by IK/KBZ, ordering joins by rank") \
+    X(LinearizedDP, "DP with search space linearization based on IK/KBZ") \
+    X(TDbasic,      "basic top-down join enumeration using generate-and-test partitioning") \
+    X(TDMinCutAGaT, "top-down join enumeration using minimal graph cuts and advanced generate-and-test partitioning") \
+    X(PEall,        "enumerates ALL join orders, inclding Cartesian products")
+LIST_PE_INSTANTIATE(INSTANTIATE)
 #undef INSTANTIATE
+#undef LIST_PE_INSTANTIATE
 
 __attribute__((constructor(202)))
 static void register_plan_enumerators()
