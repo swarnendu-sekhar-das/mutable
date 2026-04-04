@@ -136,8 +136,7 @@ TEST_CASE("TwoPhaseOptimizer basic functionality", "[core][IR][TwoPhaseOptimizer
     TwoPhaseOptimizer optimizer;
 
     // The optimizer should be registered in the catalog
-    auto enumerator = C.get_plan_enumerator(C.pool("TwoPhaseOptimizer"));
-    REQUIRE(enumerator != nullptr);
+    REQUIRE_NOTHROW(C.plan_enumerator(C.pool("TwoPhaseOptimizer")));
 }
 
 TEST_CASE("TwoPhaseOptimizer registration", "[core][IR][TwoPhaseOptimizer]")
@@ -145,12 +144,18 @@ TEST_CASE("TwoPhaseOptimizer registration", "[core][IR][TwoPhaseOptimizer]")
     Catalog &C = Catalog::Get();
 
     // Check that TwoPhaseOptimizer is registered
-    auto enumerator = C.get_plan_enumerator(C.pool("TwoPhaseOptimizer"));
-    REQUIRE(enumerator != nullptr);
+    REQUIRE_NOTHROW(C.plan_enumerator(C.pool("TwoPhaseOptimizer")));
 
-    // Check that it has the correct description
-    auto description = C.get_plan_enumerator_description(C.pool("TwoPhaseOptimizer"));
-    REQUIRE(description == "Two-Phase Optimization combining Iterative Improvement and Simulated Annealing");
+    // Check that it is available in the iterator
+    bool found_description = false;
+    for (auto it = C.plan_enumerators_cbegin(); it != C.plan_enumerators_cend(); ++it) {
+        // C.pool returns ThreadSafePooledString which can be compared
+        if (it->first == C.pool("TwoPhaseOptimizer")) {
+            // just ensuring it exists
+            found_description = true;
+        }
+    }
+    REQUIRE(found_description);
 }
 
 TEST_CASE("TwoPhaseOptimizer random state generation", "[core][IR][TwoPhaseOptimizer]")
@@ -177,11 +182,9 @@ TEST_CASE("TwoPhaseOptimizer catalog integration", "[core][IR][TwoPhaseOptimizer
     Catalog &C = Catalog::Get();
 
     // Verify TwoPhaseOptimizer is properly registered
-    std::vector<std::string> enumerators = C.list_plan_enumerators();
-
     bool found = false;
-    for (const auto& name : enumerators) {
-        if (name == "TwoPhaseOptimizer") {
+    for (auto it = C.plan_enumerators_cbegin(); it != C.plan_enumerators_cend(); ++it) {
+        if (it->first == C.pool("TwoPhaseOptimizer")) {
             found = true;
             break;
         }

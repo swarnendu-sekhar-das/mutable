@@ -42,6 +42,7 @@ set(
     IR/PlanEnumeratorTest.cpp
     IR/QueryGraphTest.cpp
     IR/TupleTest.cpp
+    IR/TwoPhaseOptimizerTest.cpp
 
     # catalog
     catalog/CardinalityEstimatorTest.cpp

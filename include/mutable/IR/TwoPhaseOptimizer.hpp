@@ -13,8 +13,11 @@
 namespace m {
 
 /**
- * Represents a complete join order with associated cost.
- * Implements transformation rules for generating neighboring states.
+ * Represents a complete join order and its associated cost.
+ * Unlike Dynamic Programming which builds optimal subplans implicitly, randomized local
+ * search algorithms (Iterative Improvement & Simulated Annealing) require an explicit
+ * representation of the entire full query plan to apply transformations (moves).
+ * Implements transformation rules to generate neighboring states.
  */
 struct JoinState {
     std::vector<std::pair<Subproblem, Subproblem>> join_pairs;
@@ -23,7 +26,10 @@ struct JoinState {
     JoinState() : cost(std::numeric_limits<double>::infinity()) {}
 
     /**
-     * Generate all neighboring states by applying transformation rules.
+     * Generate all neighboring states reachable by a single transformation.
+     * The neighborhood consists of all valid states reachable via:
+     * 1. Commutativity: Swapping left/right inputs of any join.
+     * 2. Associativity: Adjusting join depth/evaluation order for adjacent joins.
      * @param G query graph
      * @return vector of neighboring states
      */
@@ -39,6 +45,7 @@ private:
 
     /**
      * Apply associativity transformation: (A ⋈ B) ⋈ C → A ⋈ (B ⋈ C)
+     * Changes the shape of the join tree, exploring bushy and alternative left/right-deep trees.
      * @param idx index of first join pair in associativity pattern
      * @return new state with associativity applied
      */
@@ -49,8 +56,11 @@ namespace pe {
 
 /**
  * Two-Phase Optimization (2PO) algorithm implementation.
- * Combines Iterative Improvement (Phase 1) and Simulated Annealing (Phase 2)
- * as described in Ioannidis & Kang paper.
+ * Tackles extremely large join queries by avoiding exhaustive dynamic programming.
+ * Combines two randomized search strategies as described in the Ioannidis & Kang paper:
+ * Phase 1: Iterative Improvement (hill climbing random start states to strict local minima)
+ * Phase 2: Simulated Annealing (started from II's best result; escapes local minima by
+ *          probabilistically taking worse paths before cooling).
  */
 struct M_EXPORT TwoPhaseOptimizer final : PlanEnumeratorCRTP<TwoPhaseOptimizer> {
     using base_type = PlanEnumeratorCRTP<TwoPhaseOptimizer>;
@@ -75,25 +85,34 @@ public:
 
 private:
     /**
-     * Phase 1: Iterative Improvement (hill climbing).
+     * Phase 1: Iterative Improvement (II).
+     * Performs a series of rapid hill-climbing optimization passes starting from
+     * completely random plans. Greedily accepts any transformation that lowers cost.
+     * The best local minimum found is returned to seed Phase 2.
+     * 
      * @param G query graph
      * @param PT plan table
      * @param CF cost function
      * @param CE cardinality estimator
-     * @return best state found in II phase
+     * @return best local minimum state found in II phase
      */
     template<typename PlanTable>
     JoinState iterative_improvement(const QueryGraph& G, PlanTable& PT,
                                 const CostFunction& CF, const CardinalityEstimator& CE) const;
 
     /**
-     * Phase 2: Simulated Annealing.
+     * Phase 2: Simulated Annealing (SA).
+     * Starting from the strong local minimum found by II, this phase explores the
+     * neighborhood probabilistically. It can temporarily accept *higher* cost states
+     * to escape local minima traps. Over time, the "temperature" cools, restricting it
+     * strictly to better states until it freezes at an optimal/near-optimal solution.
+     * 
      * @param initial_state starting state from II phase
      * @param G query graph
      * @param PT plan table
      * @param CF cost function
      * @param CE cardinality estimator
-     * @return best state found in SA phase
+     * @return final optimized state after freezing
      */
     template<typename PlanTable>
     JoinState simulated_annealing(const JoinState& initial_state,
@@ -134,5 +153,5 @@ private:
                         const CostFunction& CF, const CardinalityEstimator& CE) const;
 };
 
-} // namespace pe
-} // namespace m
+} /* namespace pe */
+} /* namespace m */
