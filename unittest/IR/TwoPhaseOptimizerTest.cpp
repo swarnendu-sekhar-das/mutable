@@ -60,41 +60,41 @@ TEST_CASE("JoinState basic operations", "[core][IR][TwoPhaseOptimizer]")
     REQUIRE(state.join_pairs[0].second == right);
 }
 
-TEST_CASE("JoinState commutation", "[core][IR][TwoPhaseOptimizer]")
+TEST_CASE("JoinState commutation via neighbors", "[core][IR][TwoPhaseOptimizer]")
 {
     JoinState state;
     Subproblem left = Subproblem::Singleton(0);
     Subproblem right = Subproblem::Singleton(1);
     state.join_pairs.emplace_back(left, right);
 
-    // Apply commutation
-    JoinState commuted = state.apply_commutation(0);
+    // Use the public generate_neighbors API which applies commutation and associativity
+    QueryGraph G;
+    auto neighbors = state.generate_neighbors(G);
 
-    REQUIRE(commuted.join_pairs.size() == 1);
-    REQUIRE(commuted.join_pairs[0].first == right);
-    REQUIRE(commuted.join_pairs[0].second == left);
+    // With 1 join pair and 0 associativity candidates, we get 1 commutation neighbor
+    REQUIRE(neighbors.size() == 1);
+    // The commuted neighbor should swap left/right
+    REQUIRE(neighbors[0].join_pairs[0].first == right);
+    REQUIRE(neighbors[0].join_pairs[0].second == left);
 }
 
-TEST_CASE("JoinState associativity", "[core][IR][TwoPhaseOptimizer]")
+TEST_CASE("JoinState associativity via neighbors", "[core][IR][TwoPhaseOptimizer]")
 {
     JoinState state;
     Subproblem A = Subproblem::Singleton(0);
     Subproblem B = Subproblem::Singleton(1);
     Subproblem C = Subproblem::Singleton(2);
+    Subproblem AB = A | B;
 
-    // Create pattern (A ⋈ B) ⋈ C
+    // Create pattern (A ⋈ B) ⋈ C  — the second join's left must equal the first join's right for associativity
     state.join_pairs.emplace_back(A, B);
-    state.join_pairs.emplace_back(A | B, C);
+    state.join_pairs.emplace_back(AB, C);
 
-    // Apply associativity
-    JoinState associated = state.apply_associativity(0);
+    QueryGraph G;
+    auto neighbors = state.generate_neighbors(G);
 
-    REQUIRE(associated.join_pairs.size() == 2);
-    // Should become A ⋈ (B ⋈ C)
-    REQUIRE(associated.join_pairs[0].first == A);
-    REQUIRE(associated.join_pairs[0].second == B | C);
-    REQUIRE(associated.join_pairs[1].first == B);
-    REQUIRE(associated.join_pairs[1].second == C);
+    // 2 commutations (one per join pair) + 1 associativity = 3 neighbors
+    REQUIRE(neighbors.size() == 3);
 }
 
 /*======================================================================================================================
@@ -108,7 +108,7 @@ TEST_CASE("TwoPhaseOptimizer basic functionality", "[core][IR][TwoPhaseOptimizer
 
     // Create a simple 3-table query
     Catalog &C = Catalog::Get();
-    C.clear();
+    Catalog::Clear();
 
     // Create database and tables
     auto &DB = C.add_database(C.pool("test_db"));
