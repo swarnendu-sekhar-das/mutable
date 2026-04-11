@@ -30,19 +30,23 @@ set(
 add_library(${PROJECT_NAME} ${MUTABLE_SOURCES}) # STATIC or DYNAMIC, depends on BUILD_SHARED_LIBS
 
 # V8
-if(${WITH_V8})
+if(${WITH_V8} AND TARGET V8)
     add_dependencies(${PROJECT_NAME} V8)
     target_link_libraries(${PROJECT_NAME} PUBLIC ${V8_LIBRARIES})
 endif()
 
 # Binaryen
-if(${WITH_V8})
+if(${WITH_V8} AND TARGET Binaryen)
     add_dependencies(${PROJECT_NAME} Binaryen)
     target_link_libraries(${PROJECT_NAME} PUBLIC binaryen)
 endif()
 
-# others
-target_link_libraries(${PROJECT_NAME} PUBLIC ${BOOST_LINK_LIBRARIES} dl)
+# others (conditionally link Boost if available)
+if(BOOST_LINK_LIBRARIES)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${BOOST_LINK_LIBRARIES} dl)
+else()
+    target_link_libraries(${PROJECT_NAME} PUBLIC dl)
+endif()
 
 if(${BUILD_SHARED_LIBS})
     # When creating a SHARED library ${PROJECT_NAME} (libmutable.so), it will be stripped of unused and non-exported
@@ -170,8 +174,11 @@ target_link_libraries(check-bin PRIVATE ${PROJECT_NAME}_complete)
 set_target_properties(check-bin PROPERTIES OUTPUT_NAME check)
 
 add_executable(shell shell.cpp)
-add_dependencies(shell Replxx)
-target_link_libraries(shell PRIVATE ${Replxx_LIBRARIES} Threads::Threads)
+if(Replxx_LIBRARIES)
+    target_link_libraries(shell PRIVATE ${Replxx_LIBRARIES} Threads::Threads)
+else()
+    target_link_libraries(shell PRIVATE Threads::Threads)
+endif()
 target_link_libraries(shell PUBLIC ${PROJECT_NAME}_complete)
 set_target_properties(shell PROPERTIES ENABLE_EXPORTS on)
 

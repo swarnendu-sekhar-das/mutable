@@ -231,17 +231,18 @@ set_source_files_properties(
 include("CMakeFiles/Catch2.cmake")
 include("CMakeFiles/Eigen.cmake")
 include("CMakeFiles/nlohmann_json.cmake")
-if (WITH_V8)
-    include("CMakeFiles/depot_tools.cmake")
-endif()
 
 # Include all required external projects.
+# Re-enable Boost since code requires Boost headers
 include("CMakeFiles/Boost.cmake")
+# Temporarily exclude Replxx to get basic build working
 include("CMakeFiles/Replxx.cmake")
-if (WITH_V8)
-    include("CMakeFiles/Binaryen.cmake")
-    include("CMakeFiles/V8.cmake")
-endif()
+# Temporarily disable V8 for initial build
+# if (WITH_V8)
+#     include("CMakeFiles/depot_tools.cmake")
+#     include("CMakeFiles/Binaryen.cmake")
+#     include("CMakeFiles/V8.cmake")
+# endif()
 
 
 ########################################################################################################################

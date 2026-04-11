@@ -22,6 +22,6 @@ add_library(
     ${BACKEND_SOURCES}
 )
 
-if(${WITH_V8})
+if(${WITH_V8} AND TARGET Binaryen AND TARGET V8)
     add_dependencies(backend Binaryen V8)
 endif()

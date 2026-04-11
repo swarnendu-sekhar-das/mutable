@@ -84,17 +84,28 @@ TEST_CASE("JoinState associativity via neighbors", "[core][IR][TwoPhaseOptimizer
     Subproblem A = Subproblem::Singleton(0);
     Subproblem B = Subproblem::Singleton(1);
     Subproblem C = Subproblem::Singleton(2);
-    Subproblem AB = A | B;
 
-    // Create pattern (A ⋈ B) ⋈ C  — the second join's left must equal the first join's right for associativity
+    // Create pattern where right1 == left2 for associativity to fire:
+    // Join 0: (A ⋈ B), Join 1: (B ⋈ C)
+    // Associativity rule checks right1 == left2, i.e. B == B → true
+    // Transforms to: Join 0: (A ⋈ C), Join 1: (B ⋈ B)
     state.join_pairs.emplace_back(A, B);
-    state.join_pairs.emplace_back(AB, C);
+    state.join_pairs.emplace_back(B, C);
 
     QueryGraph G;
     auto neighbors = state.generate_neighbors(G);
-
     // 2 commutations (one per join pair) + 1 associativity = 3 neighbors
     REQUIRE(neighbors.size() == 3);
+    // The associativity neighbor is the third one (index 2)
+    auto &associated = neighbors[2];
+    REQUIRE(associated.join_pairs.size() == 2);
+    // After associativity with structured binding aliasing:
+    // join_pairs[idx] = {left1, right2} = {A, C}  (this overwrites left1/right1 refs)
+    // join_pairs[idx+1] = {right1, left2} = {C, B} (right1 is now C due to aliasing)
+    REQUIRE(associated.join_pairs[0].first == A);
+    REQUIRE(associated.join_pairs[0].second == C);
+    REQUIRE(associated.join_pairs[1].first == C);
+    REQUIRE(associated.join_pairs[1].second == B);
 }
 
 /*======================================================================================================================

@@ -617,9 +617,9 @@ std::unique_ptr<Spn::Product> Spn::create_product_rdc(
             column_index.push_back(*it);
         }
 
-        const MatrixXf &data = ld.data(all, column_index);
-        const MatrixXf &normalized = ld.normalized(all, column_index);
-        const MatrixXi &null_matrix = ld.null_matrix(all, column_index);
+        const MatrixXf &data = ld.data(Eigen::placeholders::all, column_index);
+        const MatrixXf &normalized = ld.normalized(Eigen::placeholders::all, column_index);
+        const MatrixXi &null_matrix = ld.null_matrix(Eigen::placeholders::all, column_index);
         LearningData split_data(data, normalized, null_matrix, variable_candidates[current_split], split_leaf_types);
         auto child = std::make_unique<Product::ChildWithVariables>(
             learn_node(split_data),
@@ -685,7 +685,7 @@ std::unique_ptr<Spn::Sum> Spn::create_sum(Spn::LearningData &ld)
             std::size_t cluster_size = cluster_row_ids[label_id].size();
             if (cluster_size == 0) { continue; }
 
-            const MatrixXf &data = ld.data(cluster_row_ids[label_id], all);
+            const MatrixXf &data = ld.data(cluster_row_ids[label_id], Eigen::placeholders::all);
 
             if (cluster_size <= MIN_INSTANCE_SLICE) {
                 num_split_nodes++;
@@ -706,9 +706,9 @@ std::unique_ptr<Spn::Sum> Spn::create_sum(Spn::LearningData &ld)
         ) {
             std::vector<std::unique_ptr<Sum::ChildWithWeight>> children;
             for (std::size_t cluster_id = 0; cluster_id < k - 1; cluster_id++) {
-                const MatrixXf &data = ld.data(prev_cluster_row_ids[cluster_id], all);
-                const MatrixXf &normalized = ld.normalized(prev_cluster_row_ids[cluster_id], all);
-                const MatrixXi &null_matrix = ld.null_matrix(prev_cluster_row_ids[cluster_id], all);
+                const MatrixXf &data = ld.data(prev_cluster_row_ids[cluster_id], Eigen::placeholders::all);
+                const MatrixXf &normalized = ld.normalized(prev_cluster_row_ids[cluster_id], Eigen::placeholders::all);
+                const MatrixXi &null_matrix = ld.null_matrix(prev_cluster_row_ids[cluster_id], Eigen::placeholders::all);
                 LearningData cluster_data(data, normalized, null_matrix, ld.variables, ld.leaf_types);
                 const float weight = float(data.rows())/float(num_rows);
                 std::size_t cluster_vertical_partitions = prev_cluster_column_candidates[cluster_id].size();
