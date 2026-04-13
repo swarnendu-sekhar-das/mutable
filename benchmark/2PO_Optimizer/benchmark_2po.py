@@ -7,7 +7,7 @@ import os
 # --- Helper functions ---
 
 def generate_simple_query():
-    sql = """-- Demo: TwoPhaseOptimizer join ordering on a 5-way join
+    sql = """-- TwoPhaseOptimizer join ordering on a 5-way join
 CREATE DATABASE shop;
 USE shop;
 
