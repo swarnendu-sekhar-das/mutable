@@ -160,12 +160,10 @@ JoinState TwoPhaseOptimizer::simulated_annealing(
   const double cooling_rate = 0.95;
 
   while (temperature > 0.001) { /* Frozen condition */
-    for (std::size_t iter = 0; iter < 50;
-         ++iter) { /* Equilibrium iterations at the current temperature */
+    for (std::size_t iter = 0; iter < 50; ++iter) { /* Equilibrium iterations at the current temperature */
       auto neighbors = current_state.generate_neighbors(G);
       if (neighbors.empty())
         continue;
-
       /* SA picks a random neighbor, rather than the absolute best neighbor.
          This allows the optimizer to smoothly traverse the state space
          probabilistically. */

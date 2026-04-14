@@ -118,6 +118,9 @@ systems:
             TDMinCutAGaT:
                 args: '--plan-enumerator TDMinCutAGaT'
                 pattern: '^Compute the logical query plan:.*'
+            TwoPhaseOptimizer:
+                args: '--plan-enumerator TwoPhaseOptimizer'
+                pattern: '^Compute the logical query plan:.*'
         cases:
             2: SELECT
                     *

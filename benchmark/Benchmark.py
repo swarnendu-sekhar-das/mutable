@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-from database_connectors import mutable, postgresql, hyper, duckdb, connector
+from database_connectors import mutable, postgresql, connector
+try:
+    from database_connectors import hyper
+except ImportError:
+    hyper = None
+try:
+    from database_connectors import duckdb
+except ImportError:
+    duckdb = None
 from database_connectors.connector import *
 from benchmark_utils import *
 
@@ -216,7 +224,7 @@ BEGIN
                     for config, measurements in configs.items():
                         if len(measurements['case']) == 0:
                             continue # no results gathered, skip this section
-                        config_params: numpy.ndarray = measurements['config'].unique()
+                        config_params: numpy.ndarray = numpy.array(measurements['config'].unique())
                         parameters: list[str] = list()
                         if experiment_params:
                             parameters.append(experiment_params)
