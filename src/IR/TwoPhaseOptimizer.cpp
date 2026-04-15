@@ -9,6 +9,7 @@ namespace m {
 
 std::vector<JoinState>
 JoinState::generate_neighbors(const QueryGraph &G) const {
+  (void)G;
   std::vector<JoinState> neighbors;
 
   // Apply Commutation Rule: (A ⋈ B) -> (B ⋈ A)
