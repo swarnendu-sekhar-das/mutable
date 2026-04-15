@@ -19,7 +19,23 @@ from pathlib import Path
 SHELL_BINARY = os.path.join('build', 'release', 'bin', 'shell')
 JOB_DIR = os.path.join('benchmark', 'job')
 SCHEMA_FILE = os.path.join('benchmark', 'job', 'data', 'schema.sql')
-ENUMERATORS = ['DPccp', 'TwoPhaseOptimizer']
+ENUMERATORS = [
+    'TwoPhaseOptimizer',
+    'PEall',
+    'TDMinCutAGaT',
+    'TDbasic',
+    'IKKBZ',
+    'TDGOO',
+    'HeuristicSearch',
+    'DPsize',
+    'DPsub',
+    'LinearizedDP',
+    'GOO',
+    'DPsubOpt',
+    'DPsizeOpt',
+    'DPccp',
+    'DPsizeSub'
+]
 NUM_RUNS = 1  # Keep at 1 since loading data is expensive
 TIMEOUT = 300  # 5 min timeout per run (data loading + query)
 OUTPUT_CSV = 'job_benchmark_with_data.csv'
