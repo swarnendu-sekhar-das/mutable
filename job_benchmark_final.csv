@@ -1,0 +1,1 @@
+query,num_tables,enumerator,opt_time_ms,enum_time_ms,exec_time_ms,plan_cost,status
