@@ -118,6 +118,7 @@ systems:
             TDMinCutAGaT:
                 args: '--plan-enumerator TDMinCutAGaT'
                 pattern: '^Compute the logical query plan:.*'
+            # Two-Phase Optimization combining Iterative Improvement and Simulated Annealing for large join queries
             TwoPhaseOptimizer:
                 args: '--plan-enumerator TwoPhaseOptimizer'
                 pattern: '^Compute the logical query plan:.*'
