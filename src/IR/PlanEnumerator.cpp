@@ -1,5 +1,5 @@
 #include <mutable/IR/PlanEnumerator.hpp>
-#include <mutable/IR/TwoPhaseOptimizer.hpp>
+#include <mutable/IR/TwoPhaseOptimizer.hpp>  // Two-Phase Optimization algorithm for large join queries
 
 #include <algorithm>
 #include <cstring>

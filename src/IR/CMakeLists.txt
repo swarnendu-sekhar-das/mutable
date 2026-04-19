@@ -15,6 +15,8 @@ add_library(
     Tuple.cpp
 )
 
+# Two-Phase Optimization (2PO) algorithm for large join queries
+# Implements randomized search combining Iterative Improvement and Simulated Annealing
 add_library(
     TwoPhaseOptimizer
     OBJECT

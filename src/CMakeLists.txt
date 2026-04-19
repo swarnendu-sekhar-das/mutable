@@ -19,7 +19,7 @@ set(
     version.cpp
     $<TARGET_OBJECTS:backend>
     $<TARGET_OBJECTS:IR>
-    $<TARGET_OBJECTS:TwoPhaseOptimizer>
+    $<TARGET_OBJECTS:TwoPhaseOptimizer>  # Two-Phase Optimization algorithm for large join queries
     $<TARGET_OBJECTS:io>
     $<TARGET_OBJECTS:storage>
     $<TARGET_OBJECTS:parse>

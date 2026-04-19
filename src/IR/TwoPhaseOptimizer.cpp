@@ -1,3 +1,33 @@
+/**
+ * @file TwoPhaseOptimizer.cpp
+ *
+ * @brief Implementation of the Two-Phase Optimization (2PO) algorithm.
+ *
+ * This file implements the Two-Phase Optimizer for join ordering as described in:
+ * "Query Optimization by Simulated Annealing" by Ioannidis and Kang, VLDB 1987.
+ *
+ * Algorithm Overview:
+ * The algorithm addresses the join ordering problem for large queries where exhaustive
+ * dynamic programming becomes intractable. It uses a two-phase randomized search:
+ *
+ * Phase 1 - Iterative Improvement (II):
+ *   - Starts from multiple random join orders
+ *   - Performs greedy hill-climbing to local minima
+ *   - Returns the best local minimum found
+ *
+ * Phase 2 - Simulated Annealing (SA):
+ *   - Starts from the best result of Phase 1
+ *   - Uses Metropolis criterion to probabilistically accept worse states
+ *   - Gradually cools down to converge to global optimum
+ *
+ * Key Data Structures:
+ * - JoinState: Represents a complete join order as a sequence of join pairs
+ * - Neighborhood generation: Commutation and associativity transformations
+ *
+ * @note This implementation is designed for queries with 10+ relations where
+ *       exhaustive DP is computationally prohibitive (O(3^n) complexity).
+ */
+
 #include <cmath>
 #include <mutable/IR/PlanTable.hpp>
 #include <mutable/IR/TwoPhaseOptimizer.hpp>

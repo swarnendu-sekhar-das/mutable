@@ -1,3 +1,23 @@
+/**
+ * @file TwoPhaseOptimizerTest.cpp
+ *
+ * @brief Unit tests for the Two-Phase Optimization (2PO) join ordering algorithm.
+ *
+ * This test suite validates the correctness and functionality of the TwoPhaseOptimizer
+ * implementation as described in the paper "Query Optimization by Simulated Annealing"
+ * by Ioannidis and Kang (VLDB 1987).
+ *
+ * Test Coverage:
+ * - JoinState basic operations (commutation, associativity)
+ * - Neighborhood generation for local search
+ * - TwoPhaseOptimizer registration in catalog
+ * - Catalog integration with existing mu*t*able components
+ * - Algorithm phase validation (Iterative Improvement and Simulated Annealing)
+ *
+ * @note These tests focus on basic functionality and integration.
+ *       Performance benchmarks are handled separately in the benchmark suite.
+ */
+
 #include "catch2/catch.hpp"
 
 #include <iostream>

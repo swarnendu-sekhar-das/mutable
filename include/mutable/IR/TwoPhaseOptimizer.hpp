@@ -1,3 +1,25 @@
+/**
+ * @file TwoPhaseOptimizer.hpp
+ *
+ * @brief Implementation of the Two-Phase Optimization (2PO) algorithm for join ordering.
+ *
+ * This file implements the Two-Phase Optimizer as described in the paper:
+ * "Query Optimization by Simulated Annealing" by Ioannidis and Kang.
+ *
+ * The algorithm tackles large join queries that are intractable for exhaustive dynamic programming
+ * by using a two-phase randomized search approach:
+ *
+ * Phase 1: Iterative Improvement (II) - Rapid hill-climbing from multiple random start states
+ * Phase 2: Simulated Annealing (SA) - Probabilistic search to escape local minima
+ *
+ * Key Components:
+ * - JoinState: Represents a complete join order as a sequence of join pairs
+ * - TwoPhaseOptimizer: Main optimizer implementing the two-phase algorithm
+ *
+ * @note This optimizer is particularly effective for large join queries (10+ relations)
+ *       where exhaustive DP becomes computationally prohibitive.
+ */
+
 #pragma once
 
 #include <mutable/IR/PlanEnumerator.hpp>
@@ -89,7 +111,7 @@ private:
      * Performs a series of rapid hill-climbing optimization passes starting from
      * completely random plans. Greedily accepts any transformation that lowers cost.
      * The best local minimum found is returned to seed Phase 2.
-     * 
+     *
      * @param G query graph
      * @param PT plan table
      * @param CF cost function
@@ -106,7 +128,7 @@ private:
      * neighborhood probabilistically. It can temporarily accept *higher* cost states
      * to escape local minima traps. Over time, the "temperature" cools, restricting it
      * strictly to better states until it freezes at an optimal/near-optimal solution.
-     * 
+     *
      * @param initial_state starting state from II phase
      * @param G query graph
      * @param PT plan table

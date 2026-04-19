@@ -42,7 +42,7 @@ set(
     IR/PlanEnumeratorTest.cpp
     IR/QueryGraphTest.cpp
     IR/TupleTest.cpp
-    IR/TwoPhaseOptimizerTest.cpp
+    IR/TwoPhaseOptimizerTest.cpp  # Unit tests for Two-Phase Optimization algorithm
 
     # catalog
     catalog/CardinalityEstimatorTest.cpp
