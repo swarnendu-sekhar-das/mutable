@@ -38,28 +38,28 @@ topologies = summary['experiment'].unique()
 # Create a plot for each topology
 for topology in topologies:
     topology_data = summary[summary['experiment'] == topology]
-    
+
     fig, ax = plt.subplots(figsize=(14, 8))
-    
+
     # Plot each planner
     for planner in planners:
         planner_data = topology_data[topology_data['planner'] == planner]
         if len(planner_data) > 0:
-            ax.plot(planner_data['case'], planner_data['time'], 
+            ax.plot(planner_data['case'], planner_data['time'],
                    marker='o', label=planner, linewidth=2, markersize=6)
-    
+
     ax.set_xlabel('Number of Relations', fontsize=14, fontweight='bold')
     ax.set_ylabel('Execution Time (ms)', fontsize=14, fontweight='bold')
-    ax.set_title(f'Plan Enumerator Performance - {topology.capitalize()} Topology', 
+    ax.set_title(f'Plan Enumerator Performance - {topology.capitalize()} Topology',
                  fontsize=16, fontweight='bold')
     ax.set_yscale('log')
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10)
     ax.grid(True, alpha=0.3)
-    
+
     plt.tight_layout()
     plt.savefig(f'{topology}_performance.png', dpi=300, bbox_inches='tight')
     plt.close()
-    
+
     print(f"Generated plot for {topology}")
 
 # Create a combined plot with all topologies in subplots
@@ -69,13 +69,13 @@ axes = axes.flatten()
 for idx, topology in enumerate(topologies):
     topology_data = summary[summary['experiment'] == topology]
     ax = axes[idx]
-    
+
     for planner in planners:
         planner_data = topology_data[topology_data['planner'] == planner]
         if len(planner_data) > 0:
-            ax.plot(planner_data['case'], planner_data['time'], 
+            ax.plot(planner_data['case'], planner_data['time'],
                    marker='o', label=planner, linewidth=2, markersize=5)
-    
+
     ax.set_xlabel('Number of Relations', fontsize=11, fontweight='bold')
     ax.set_ylabel('Time (ms)', fontsize=11, fontweight='bold')
     ax.set_title(f'{topology.capitalize()}', fontsize=13, fontweight='bold')
@@ -97,23 +97,23 @@ axes = axes.flatten()
 for idx, topology in enumerate(topologies):
     topology_data = summary[summary['experiment'] == topology]
     ax = axes[idx]
-    
+
     # Plot TwoPhaseOptimizer prominently
     two_phase_data = topology_data[topology_data['planner'] == 'TwoPhaseOptimizer']
     if len(two_phase_data) > 0:
-        ax.plot(two_phase_data['case'], two_phase_data['time'], 
-               marker='o', label='TwoPhaseOptimizer', linewidth=3, 
+        ax.plot(two_phase_data['case'], two_phase_data['time'],
+               marker='o', label='TwoPhaseOptimizer', linewidth=3,
                markersize=8, color='red', alpha=0.8)
-    
+
     # Plot other planners in gray
     other_planners = [p for p in planners if p != 'TwoPhaseOptimizer']
     for planner in other_planners:
         planner_data = topology_data[topology_data['planner'] == planner]
         if len(planner_data) > 0:
-            ax.plot(planner_data['case'], planner_data['time'], 
-                   marker='o', label=planner, linewidth=1.5, 
+            ax.plot(planner_data['case'], planner_data['time'],
+                   marker='o', label=planner, linewidth=1.5,
                    markersize=4, color='gray', alpha=0.5)
-    
+
     ax.set_xlabel('Number of Relations', fontsize=11, fontweight='bold')
     ax.set_ylabel('Time (ms)', fontsize=11, fontweight='bold')
     ax.set_title(f'{topology.capitalize()}', fontsize=13, fontweight='bold')
@@ -132,7 +132,7 @@ print("Generated TwoPhaseOptimizer comparison plot")
 avg_performance = summary.groupby('planner')['time'].mean().sort_values(ascending=True)
 
 fig, ax = plt.subplots(figsize=(12, 8))
-bars = ax.bar(range(len(avg_performance)), avg_performance.values, 
+bars = ax.bar(range(len(avg_performance)), avg_performance.values,
               color='steelblue', edgecolor='black', linewidth=1.5)
 ax.set_xlabel('Plan Enumerator', fontsize=14, fontweight='bold')
 ax.set_ylabel('Average Execution Time (ms)', fontsize=14, fontweight='bold')
@@ -155,7 +155,7 @@ print("Generated average performance bar chart")
 print("\nAll plots generated successfully!")
 print("Generated files:")
 print("- chain_performance.png")
-print("- clique_performance.png") 
+print("- clique_performance.png")
 print("- cycle_performance.png")
 print("- star_performance.png")
 print("- all_topologies_performance.png")
